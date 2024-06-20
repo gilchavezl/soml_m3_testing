@@ -43,7 +43,7 @@ timeout = 10
 try:
     dt = datetime.now()
     log_file = dt.strftime("./log/serial_log_%Y%m%d%H%M.csv")
-    headers = 'time,category,subcategory,tic,data\n'
+    headers = 'time,category,subcategory,tic,mV,raw_data\n'
 
     file = open(log_file, "w")  # write mode
     file.write(headers)
@@ -108,7 +108,7 @@ def get_cat(data):
         logging.debug(f'TIC:\t{tic}')
         logging.debug(f'DATA:\t{data_dump}')
         logging.debug(f'MV:\t{mv_readings}')
-        output = [category, sub_category, tic, data_dump]
+        output = [category, sub_category, tic, mv_readings, data_dump]
     except Exception as e:
         logging.error(f'Could not parse data.\nError reported:\n{e}')
         output = None
@@ -118,7 +118,7 @@ def get_cat(data):
 def log_to_csv(timestamp, data):
     """ append text to a file """
     try:
-        new_row = f'{timestamp:.2f},{data[0]},{data[1]},{data[2]},{data[3]}\n'
+        new_row = f'{timestamp:.2f},{data[0]},{data[1]},{data[2]},{data[3]},{data[4]}\n'
         fileid = open(log_file, "a")  # append mode
         fileid.write(new_row)
         fileid.close()
