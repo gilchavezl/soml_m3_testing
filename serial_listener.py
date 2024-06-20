@@ -12,6 +12,7 @@ This script opens a serial port and reads data coming through it, logs to a csv 
 import serial, os, logging
 import time
 from datetime import datetime
+import conversions
 
 
 # logging config
@@ -80,6 +81,8 @@ def get_cat(data):
                 # this is a message with TIC data
                 sub_split = data.split(': ')
                 data_dump = sub_split[1]
+                voltages = conversions.tic_hex_to_mv(data_dump)
+                logging.DEBUG(f'VOLTAGES:\t{voltages}')
             else:
                 sub_category = 'OTHER'
                 data_dump = data
