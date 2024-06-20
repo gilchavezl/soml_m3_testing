@@ -1,6 +1,32 @@
-import serial, string
+"""
+@brief CCHM serial debug interface simple logger script
+@author Gilberto Chavez
+@date 2024/06/20
+
+Test script to log serial debug messages from the CCHM.
+
+This script opens a serial port and reads data coming through it, logs to a csv file under ./log folder.
+"""
+
+
+import serial, os, logging
 import time
 from datetime import datetime
+
+
+# logging config
+logging.basicConfig(
+    level=logging.INFO,
+    format="{asctime} {levelname:<8} {message}",
+    style='{'
+)
+# Logging levels:
+# CRITICAL  50
+# ERROR		40
+# WARNING	30
+# INFO      20
+# DEBUG		10
+# NOTSET	0
 
 
 # port = '/dev/ttyACM0'
@@ -21,19 +47,20 @@ try:
     file = open(log_file, "w")  # write mode
     file.write(headers)
     file.close()
+    logging.info(f'Success creating log file with filename <{log_file}>')
 except Exception as e:
-    print(f'Could not create or open file.\nError reported:\n{e}')
+    logging.critical(f'Could not create or open file.\nError reported:\n{e}')
     exit(0)
 
 
 def get_cat(data):
     try:
         split_list = data.split()
-        print(split_list)
+        logging.debug(split_list)
         token = split_list[0]
-        print(token)
+        logging.debug(token)
         start = token[:3]
-        print(start)
+        logging.debug(start)
         category = ''
         sub_category = ''
         tic = ''
@@ -68,13 +95,13 @@ def get_cat(data):
             sub_category = 'UNKNOWN'
             tic = 'NA'
             data_dump = data
-        print(f'CAT:\t{category}')
-        print(f'SUBCAT:\t{sub_category}')
-        print(f'TIC:\t{tic}')
-        print(f'DATA:\t{data_dump}')
+        logging.debug(f'CAT:\t{category}')
+        logging.debug(f'SUBCAT:\t{sub_category}')
+        logging.debug(f'TIC:\t{tic}')
+        logging.debug(f'DATA:\t{data_dump}')
         output = [category, sub_category, tic, data_dump]
     except Exception as e:
-        print(f'Could not parse data.\nError reported:\n{e}')
+        logging.error(f'Could not parse data.\nError reported:\n{e}')
         output = None
     return output
 
@@ -87,8 +114,7 @@ def log_to_csv(timestamp, data):
         fileid.write(new_row)
         fileid.close()
     except Exception as e:
-        print(f'Could not log data to file.\nError reported:\n')
-
+        logging.error(f'Could not log data to file.\nError reported:\n')
 
 
 def main():
@@ -97,35 +123,32 @@ def main():
     for port in ports:
         try:
             ser = serial.Serial(port, baudrate, bytesize, parity, stopbits, timeout)
-            print(f'Success opening port {port}')
+            logging.info(f'Success opening port {port}')
             no_port = False
             break
         except Exception as e:
-            print(f'Could not open port {port}')
+            logging.warning(f'Could not open port {port}')
     if(no_port):
-        print(f'No devices found on ports listed, exitting.')
+        logging.critical(f'No devices found on ports listed, exiting.')
         exit(0)
     run = True
     try:    
         while run:
-            print(f'Start reading port')
+            logging.info(f'Start reading port')
             while output != '':
                 output = ser.readline()
                 timestamp = time.time()
                 # if( len(output) > 0 ):
                 #     get_cat(output)
                 if( output != b'\r\n' ):
-                    # print(output)
                     data_str = output[:-2].decode("utf-8")
-                    # print(output[:-2].decode("utf-8"))
-                    print(data_str)
-                    # print('.')
+                    logging.debug(data_str)
                     data_to_log = get_cat(data_str)
                     if data_to_log is not None:
                         log_to_csv(timestamp, data_to_log)
             output = ""
     except KeyboardInterrupt:
-        print("Execution stopped by user. Stopping...")
+        logging.info("Execution stopped by user. Stopping...")
         run = False
 
 
