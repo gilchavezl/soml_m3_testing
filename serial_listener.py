@@ -66,12 +66,14 @@ def get_cat(data):
         sub_category = ''
         tic = ''
         data_dump = ''
+        mv_readings = ''
         if( start == 'NTP' ):
             # this is a CCHM DEBUG MSG with NTP update data
             category = 'NTP DEBUG MSG'
             sub_category = 'NTP'
             tic = 'NA'
             data_dump = data
+            mv_readings = 'NA'
         elif( start == 'TIC' ):
             # this is a TIC DEBUG MSG
             category = 'TIC DEBUG MSG'
@@ -81,27 +83,31 @@ def get_cat(data):
                 # this is a message with TIC data
                 sub_split = data.split(': ')
                 data_dump = sub_split[1]
-                voltages = conversions.tic_hex_to_mv(data_dump)
-                logging.DEBUG(f'VOLTAGES:\t{voltages}')
+                mv_string = conversions.hex_str_to_mv_str(data_dump)
+                mv_readings = mv_string
             else:
                 sub_category = 'OTHER'
                 data_dump = data
+                mv_readings = 'NA'
         elif( start == '171'):
             # this is a CCHM DEBUG MSG for publishing
             category = 'CCHM DEBUG MSG'
             sub_category = 'PUB'
             tic = 'NA'
             data_dump = data
+            mv_readings = 'NA'
         else:
             # unknown category
             category = 'UNKNOWN'
             sub_category = 'UNKNOWN'
             tic = 'NA'
             data_dump = data
+            mv_readings = 'NA'
         logging.debug(f'CAT:\t{category}')
         logging.debug(f'SUBCAT:\t{sub_category}')
         logging.debug(f'TIC:\t{tic}')
         logging.debug(f'DATA:\t{data_dump}')
+        logging.debug(f'MV:\t{mv_readings}')
         output = [category, sub_category, tic, data_dump]
     except Exception as e:
         logging.error(f'Could not parse data.\nError reported:\n{e}')

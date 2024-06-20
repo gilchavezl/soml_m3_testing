@@ -96,14 +96,22 @@ def convert_to_volts(raw_adc_counts):
     return adc_voltages
 
 
-def tic_hex_to_mv(hex_string):
+def hex_str_to_mv_str(hex_string):
+    # print(f'Data received:\n{hex_string}')
     as_list_hex = hex_string.split()
+    # print(f'Data as list:\n{as_list_hex}')
     int_list = [ int(x,16) for x in as_list_hex ]
+    # print(f'Data as list of ints:\n{int_list}')
     data_split = split_tic_data(int_list)
+    # print(f'Data splitted:\n{data_split}')
     values_int24 = get_adc_code(data_split)
+    # print(f'Data as int24:\n{values_int24}')
     voltages = convert_to_volts(values_int24)
+    # print(f'Data as voltages:\n{voltages}')
     voltages_r = list(np.round(voltages,4))
-    output_string = ' '.join(voltages_r)
+    # print(f'Data as voltages rounded:\n{voltages_r}')
+    output_string = ' '.join(str(v) for v in voltages_r)
+    # print(f'as string:\t{output_string}')
     return output_string
     
 
