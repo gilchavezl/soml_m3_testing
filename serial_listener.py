@@ -93,13 +93,18 @@ def log_to_csv(timestamp, data):
 
 def main():
     output = 'x'
+    no_port = True
     for port in ports:
         try:
             ser = serial.Serial(port, baudrate, bytesize, parity, stopbits, timeout)
             print(f'Success opening port {port}')
+            no_port = False
             break
         except Exception as e:
             print(f'Could not open port {port}')
+    if(no_port):
+        print(f'No devices found on ports listed, exitting.')
+        exit(0)
     run = True
     try:    
         while run:
