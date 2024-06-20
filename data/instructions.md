@@ -1,0 +1,1 @@
+Place FITS file with thermocouple data in this folder.
